@@ -17,7 +17,7 @@ public class HotelService {
     HotelRepository hotelRepository;
 
     public HotelEntity getHotelById(Long hotelId){
-        return hotelRepository.findByHotelId(hotelId);
+        return hotelRepository.findByHotelId(hotelId).orElseThrow(() -> new RuntimeException("Hotel not found"));
     }
 
     public List<HotelEntity> getAllHotels(){
@@ -26,37 +26,43 @@ public class HotelService {
 
     public HotelEntity createHotel(CreateHotelRequest request){
         HotelEntity hotel = new HotelEntity();
+
+        if(hotelRepository.existsByHotelName(request.getHotelName())){
+            throw new RuntimeException("HotelName existed");
+        }
+
         hotel.setHotelName(request.getHotelName());
         hotel.setRate(request.getRate());
-        hotel = hotelRepository.save(hotel);
-        return hotel;
+        hotel.setStatus(request.isStatus());
+        hotel.setVersion(request.getVersion());
+        hotel.setCreatedAt(request.getCreatedAt());
+        hotel.setCreatedBy(request.getCreatedBy());
+        hotel.setUpdateAt(request.getUpdateAt());
+        hotel.setUpdateBy(request.getUpdateBy());
+
+        return hotelRepository.save(hotel);
     }
 
-//    public HotelEntity updateHotelById(Long hotelId, UpdateHotelRequest request){
-//        HotelEntity hotel = hotelRepository.findByHotelId(hotelId);
-//
-//        if(hotel == null)
-//            return null;
-//        hotel.setHotelName(request.getHotelName());
-//        hotel.setRate(request.getRate());
-//        hotel = hotelRepository.save(hotel);
-//        return hotel;
-//    }
-//
-//    public String deleteOrDisableHotel(boolean isStatus, Long hotelId){
-//        HotelEntity hotel = hotelRepository.findByHotelId(hotelId);
-//
-//        if(hotel == null)
-//            return null;
-//
-//        if(isStatus){
-//            hotelRepository.delete(hotel);
-//            return "Delete successful";
-//        }
-//        else{
-//            hotel.setStatus(false);
-//            hotel = hotelRepository.save(hotel);
-//            return "Disable successful";
-//        }
-//    }
+    public HotelEntity updateHotelById(Long hotelId, UpdateHotelRequest request){
+        HotelEntity hotel = getHotelById(hotelId);
+
+        hotel.setHotelName(request.getHotelName());
+        hotel.setRate(request.getRate());
+
+        return hotelRepository.save(hotel);
+    }
+
+    public String deleteOrDisableHotel(boolean isStatus, Long hotelId){
+        HotelEntity hotel = getHotelById(hotelId);
+
+        if(isStatus){
+            hotelRepository.delete(hotel);
+            return "Delete successful";
+        }
+        else{
+            hotel.setStatus(false);
+            hotel = hotelRepository.save(hotel);
+            return "Disable successful";
+        }
+    }
 }

@@ -10,5 +10,7 @@ import java.util.Optional;
 @Repository
 public interface HotelRepository extends JpaRepository<HotelEntity, Long> {
     @EntityGraph(attributePaths = {"location"})
-    HotelEntity findByHotelId(Long hotelId);
+    Optional<HotelEntity> findByHotelId(Long hotelId);
+
+    boolean existsByHotelName(String hotelName);
 }

@@ -2,8 +2,10 @@ package dev.hawknet37.hotel_booking.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,7 +17,8 @@ public class HotelEntity {
     @Column(name = "hotel_id")
     private Long hotelId;
 
-    @Column(name = "name", nullable = false)
+    @Size(min = 2, message = "Name cannot be left blank")
+    @Column(name = "name")
     private String hotelName;
 
     @Column(name = "rate")
@@ -28,13 +31,13 @@ public class HotelEntity {
     private int version;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     @Column(name = "created_by")
     private String createdBy;
 
     @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    private LocalDate updateAt;
 
     @Column(name = "update_by")
     private String updateBy;
